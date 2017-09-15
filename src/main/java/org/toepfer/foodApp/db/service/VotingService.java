@@ -26,6 +26,7 @@ public class VotingService {
     @Autowired private RestaurantSelectorRepository restaurantSelectorRepository;
 
     public static final int NUM_RESTAURANTS =5;
+    public static final int INITIAL_VOTES = 0;
 
     public List<Restaurant> getSessionRestaurants(){
 
@@ -42,14 +43,14 @@ public class VotingService {
         session.setActive(true);
 
         List<String> restaurantNames = restaurantSelectorRepository.selectRestaurantOptions(NUM_RESTAURANTS);
-        List<RestaurantEntity> restaurantEntities = getRestaurantEntities(session, restaurantNames);
+        List<RestaurantEntity> restaurantEntities = createRestaurantEntities(session, restaurantNames);
 
         session.setRestaurantEntities(restaurantEntities);
 
         sessionRepository.markAllSessionsInactive();//mark all old sessions inactive
         sessionRepository.saveAndFlush(session);//insert new session
 
-        return restaurantEntities.stream().map(r -> restaurantEntityToRestaurant(r,0)).collect(Collectors.toList());
+        return restaurantEntities.stream().map(r -> restaurantEntityToRestaurant(r,INITIAL_VOTES)).collect(Collectors.toList());
     }
 
     @Transactional
@@ -63,7 +64,7 @@ public class VotingService {
         if(restaurantEntity != null){
             voteEntity.setRestaurantEntity(restaurantEntity);
         }else{
-            //throw something
+            throw new IllegalArgumentException("vote() was called with no restaurantId");
         }
 
         voteRepository.saveAndFlush(voteEntity);
@@ -101,7 +102,7 @@ public class VotingService {
         return restaurant;
     }
 
-    private List<RestaurantEntity> getRestaurantEntities(VotingSession session, List<String> restaurantNames) {
+    private List<RestaurantEntity> createRestaurantEntities(VotingSession session, List<String> restaurantNames) {
         List<RestaurantEntity> restaurantEntities = new ArrayList<>();
         for(int i = 0; i < NUM_RESTAURANTS; i++){
             RestaurantEntity restaurantEntity = new RestaurantEntity();
