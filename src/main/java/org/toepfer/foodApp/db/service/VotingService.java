@@ -52,19 +52,13 @@ public class VotingService {
         return restaurantEntities.stream().map(r -> restaurantEntityToRestaurant(r,0)).collect(Collectors.toList());
     }
 
-
+    @Transactional
     public void vote(int restaurantId, String username){
 
         UserEntity userEntity = userRepository.findOne(username);
         VotingSession votingSession = sessionRepository.findOneByActiveTrue();
         RestaurantEntity restaurantEntity = restaurantRepository.findOneByRestaurantIdAndVotingSession(restaurantId,votingSession);
-
-        VoteEntity voteEntity = voteRepository.findByUserEntityAndVotingSession(userEntity,votingSession);
-        if(voteEntity == null) {
-            voteEntity = new VoteEntity();
-            voteEntity.setUserEntity(userEntity);
-            voteEntity.setVotingSession(votingSession);
-        }
+        VoteEntity voteEntity = getVote(userEntity, votingSession);
 
         if(restaurantEntity != null){
             voteEntity.setRestaurantEntity(restaurantEntity);
@@ -73,6 +67,20 @@ public class VotingService {
         }
 
         voteRepository.saveAndFlush(voteEntity);
+    }
+
+    private VoteEntity getVote(UserEntity userEntity, VotingSession votingSession){
+        VoteEntity voteEntity = findExistingVoteByUser(userEntity,votingSession);
+
+        if(voteEntity == null) {
+            voteEntity = new VoteEntity();
+            voteEntity.setUserEntity(userEntity);
+        }
+        return voteEntity;
+    }
+
+    private VoteEntity findExistingVoteByUser(UserEntity userEntity, VotingSession votingSession) {
+        return voteRepository.findBySessionAndUser(userEntity,votingSession);
     }
 
 

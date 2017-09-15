@@ -53,7 +53,7 @@ public class WebController extends WebMvcConfigurerAdapter {
     @PostMapping("/home")
     public String vote(Principal principal, ViewOptions viewOptions, Vote vote, Model model) {
 
-        if(vote == null) {
+        if(vote != null) {
             votingService.vote(vote.getId(), principal.getName());
         }//no reason to do anything if vote is null
 

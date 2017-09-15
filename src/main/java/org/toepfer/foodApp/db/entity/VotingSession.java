@@ -19,9 +19,6 @@ public class VotingSession {
     @Column(name = "ACTIVE")
     private Boolean active;
 
-    @OneToMany(mappedBy = "votingSession")
-    private Set<VoteEntity> voteEntities;
-
     @OneToMany(mappedBy = "votingSession", cascade = CascadeType.ALL)
     private List<RestaurantEntity> restaurantEntities;
 
@@ -39,14 +36,6 @@ public class VotingSession {
 
     public void setActive(Boolean active) {
         this.active = active;
-    }
-
-    public Set<VoteEntity> getVotes() {
-        return voteEntities;
-    }
-
-    public void setVotes(Set<VoteEntity> voteEntities) {
-        this.voteEntities = voteEntities;
     }
 
     public List<RestaurantEntity> getRestaurantEntities() {

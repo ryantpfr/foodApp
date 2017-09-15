@@ -19,10 +19,6 @@ public class VoteEntity {
     private UserEntity userEntity;
 
     @ManyToOne
-    @JoinColumn(name = "SESSION_ID")
-    private VotingSession votingSession;
-
-    @ManyToOne
     @JoinColumn(name = "RESTAURANT_ID")
     private RestaurantEntity restaurantEntity;
 
@@ -40,14 +36,6 @@ public class VoteEntity {
 
     public void setUserEntity(UserEntity userEntity) {
         this.userEntity = userEntity;
-    }
-
-    public VotingSession getVotingSession() {
-        return votingSession;
-    }
-
-    public void setVotingSession(VotingSession votingSession) {
-        this.votingSession = votingSession;
     }
 
     public RestaurantEntity getRestaurantEntity() {

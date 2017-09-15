@@ -26,12 +26,12 @@ to secure my application instead of implementing my own security mechanisms.
 relational database. The createDB.sql file is located in src/main/resources 
 and is formatted for a mySql db. The application does not use any native 
 queries or mySql specific technology. The application also uses only standard 
-JPA features.
+JPA features. and The database is normalized.
                                 ________________
    ________________             |vote_t        |             ________________
    |session_t     |             |--------------|             |user_t        |
    |--------------|             |VOTE_ID(PK)   |             |--------------|
--> |SESSION_ID(PK)| <---------- |SESSION_ID    |       ----> |USERNAME(PK)  |
+-> |SESSION_ID(PK)|             |SESSION_ID    |       ----> |USERNAME(PK)  |
 |  |ACTIVE        |       ------|RESTAURANT_ID |       |     |PASSWORD      |
 |  ----------------       |     |USER          |--------     |IS_ADMIN      |
 |                         |     ----------------             ----------------
@@ -42,10 +42,6 @@ JPA features.
 ---|SESSION_ID    |
    |NAME          |
    ----------------
-   
-As you can see above the design is not normalized due to vote referencing
-session and vote referencing restaurant, which references session. This was
-chosen to simplify queries selecting votes by user.
 
 ------------------------------------Web:-------------------------------------
     Despite being outdated, using MVC and Thymeleaf instead of a separate
