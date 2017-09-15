@@ -20,7 +20,9 @@
             </td>
         </tr>
     </div>
-
+    <div th:if="${restaurants.empty}">
+        <P>No voting session is active.<br/>Please use admin credentials to create a new session.</P>
+    </div>
 </table>
 
 <div sec:authorize="hasRole('ROLE_ADMIN')">
