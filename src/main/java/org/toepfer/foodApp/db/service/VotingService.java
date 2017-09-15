@@ -4,10 +4,7 @@ import org.toepfer.foodApp.db.entity.RestaurantEntity;
 import org.toepfer.foodApp.db.entity.UserEntity;
 import org.toepfer.foodApp.db.entity.VoteEntity;
 import org.toepfer.foodApp.db.entity.VotingSession;
-import org.toepfer.foodApp.db.repository.RestaurantRepository;
-import org.toepfer.foodApp.db.repository.SessionRepository;
-import org.toepfer.foodApp.db.repository.UserRepository;
-import org.toepfer.foodApp.db.repository.VoteRepository;
+import org.toepfer.foodApp.db.repository.*;
 import org.toepfer.foodApp.web.bean.Restaurant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +23,7 @@ public class VotingService {
     @Autowired private UserRepository userRepository;
     @Autowired private VoteRepository voteRepository;
     @Autowired private RestaurantRepository restaurantRepository;
+    @Autowired private RestaurantSelectorRepository restaurantSelectorRepository;
 
     public static final int NUM_RESTAURANTS =5;
 
@@ -43,20 +41,13 @@ public class VotingService {
         VotingSession session = new VotingSession();
         session.setActive(true);
 
-        List<RestaurantEntity> restaurantEntities = new ArrayList<>();
-        List<String> restaurantNames = RestaurantSelectionHelper.selectRestaurantOptions(NUM_RESTAURANTS);
-        for(int i = 0; i < NUM_RESTAURANTS; i++){
-            RestaurantEntity restaurantEntity = new RestaurantEntity();
-            restaurantEntity.setName(restaurantNames.get(i));
-            restaurantEntity.setVotingSession(session);
-            restaurantEntities.add(restaurantEntity);
-        }
+        List<String> restaurantNames = restaurantSelectorRepository.selectRestaurantOptions(NUM_RESTAURANTS);
+        List<RestaurantEntity> restaurantEntities = getRestaurantEntities(session, restaurantNames);
 
         session.setRestaurantEntities(restaurantEntities);
 
-        sessionRepository.markSessionsInactive();
-
-        sessionRepository.saveAndFlush(session);
+        sessionRepository.markAllSessionsInactive();//mark all old sessions inactive
+        sessionRepository.saveAndFlush(session);//insert new session
 
         return restaurantEntities.stream().map(r -> restaurantEntityToRestaurant(r,0)).collect(Collectors.toList());
     }
@@ -100,5 +91,16 @@ public class VotingService {
         restaurant.setVotes(votes);
 
         return restaurant;
+    }
+
+    private List<RestaurantEntity> getRestaurantEntities(VotingSession session, List<String> restaurantNames) {
+        List<RestaurantEntity> restaurantEntities = new ArrayList<>();
+        for(int i = 0; i < NUM_RESTAURANTS; i++){
+            RestaurantEntity restaurantEntity = new RestaurantEntity();
+            restaurantEntity.setName(restaurantNames.get(i));
+            restaurantEntity.setVotingSession(session);
+            restaurantEntities.add(restaurantEntity);
+        }
+        return restaurantEntities;
     }
 }

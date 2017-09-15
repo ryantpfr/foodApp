@@ -1,7 +1,6 @@
 package org.toepfer.foodApp.security;
 
-import org.toepfer.foodApp.db.CustomUserNotFoundException;
-import org.toepfer.foodApp.db.entity.UserEntity;
+import org.toepfer.foodApp.db.FoodAppUserNotFoundException;
 import org.toepfer.foodApp.db.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,21 +27,21 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        UserEntity userEntity;
+        SecurityUser securityUser;
         try {
-            userEntity = authenticationService.getUser(username);
-        } catch (CustomUserNotFoundException e) {
+            securityUser = authenticationService.getUser(username);
+        } catch (FoodAppUserNotFoundException e) {
             throw new UsernameNotFoundException(username);
         }
 
 
         List<Authorities> authorities = new ArrayList<>();
         authorities.add(Authorities.ROLE_USER);
-        if(userEntity.isAdmin()){
+        if(securityUser.isAdmin()){
             authorities.add(Authorities.ROLE_ADMIN);
         }
 
-        User user = new User(userEntity.getUsername(),userEntity.getPassword(),getGrantedAuthorities(authorities));
+        User user = new User(securityUser.getUsername(),securityUser.getPassword(),getGrantedAuthorities(authorities));
 
         return user;
     }

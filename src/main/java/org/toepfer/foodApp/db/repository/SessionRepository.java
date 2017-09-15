@@ -13,7 +13,7 @@ public interface SessionRepository extends JpaRepository<VotingSession,Integer>{
 
     @Modifying
     @Query("UPDATE VotingSession SET active = false")
-    void markSessionsInactive();
+    void markAllSessionsInactive();
 
     VotingSession findOneByActiveTrue();
 
